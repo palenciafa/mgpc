@@ -13,8 +13,7 @@
         <tr>
             <th>Product</th>
             <th>Quantity</th>
-            <th>Sale Price</th>
-            <th>Total</th>
+            <th>Total Price</th>
             <th>Date</th>
         </tr>
     </thead>
@@ -23,12 +22,11 @@
         <tr>
             <td>{{ $sale->product->name }}</td>
             <td>{{ $sale->quantity }}</td>
-            <td>{{ number_format($sale->sale_price, 2) }}</td>
-            <td>{{ number_format($sale->quantity * $sale->sale_price, 2) }}</td>
+            <td>₱{{ number_format($sale->total_price, 2) }}</td>
             <td>{{ $sale->created_at->format('Y-m-d') }}</td>
         </tr>
         @empty
-        <tr><td colspan="5">No sales found.</td></tr>
+        <tr><td colspan="4">No sales found.</td></tr>
         @endforelse
     </tbody>
 </table>

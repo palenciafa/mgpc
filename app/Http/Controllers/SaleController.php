@@ -26,8 +26,7 @@ class SaleController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'sale_price' => 'required|numeric|min:0',
+            'quantity'   => 'required|integer|min:1',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -37,22 +36,28 @@ class SaleController extends Controller
                 abort(400, 'Not enough stock available.');
             }
 
+            // Compute total price = product price × quantity
+            $totalPrice = $product->price * $request->quantity;
+
             // Deduct stock
             $product->stock -= $request->quantity;
             $product->save();
 
             // Create Sale record
             $sale = Sale::create([
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'sale_price' => $request->sale_price,
+                'product_id'  => $request->product_id,
+                'quantity'    => $request->quantity,
+                'total_price' => $totalPrice,
+                'user_id'     => auth()->id(),
             ]);
 
-            // Create Stock Log entry
+            // Create Stock Log
             StockLog::create([
                 'product_id' => $product->id,
-                'change' => -$request->quantity,
-                'note' => 'Sale ID ' . $sale->id,
+                'type'       => 'out', // since it's a sale
+                'quantity'   => $request->quantity,
+                'reason'     => 'Sale ID ' . $sale->id,
+                'user_id'    => auth()->id(), // optional, if you want to track the user,
             ]);
         });
 
@@ -63,6 +68,4 @@ class SaleController extends Controller
     {
         return view('sales.show', compact('sale'));
     }
-
-    // Optional: If you want to allow edits or deletes, you can add them here
 }
