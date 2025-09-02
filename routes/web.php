@@ -7,23 +7,27 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockLogController;
+use App\Http\Controllers\AdminDashboardController;
 
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// User dashboard (default Laravel Breeze/Jetstream style)
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-});
+// Admin dashboard
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('admin.dashboard');
 
 
+Route::get('/admin/dashboard', [App\Http\Controllers\AdminDashboardController::class, 'index'])
+    ->name('admin.dashboard')
+    ->middleware('auth'); // protect route
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -31,10 +35,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('products', ProductController::class);

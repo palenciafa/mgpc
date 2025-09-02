@@ -12,4 +12,10 @@ class Sale extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function category()
+{
+    return $this->belongsTo(Category::class);
+}
+
 }

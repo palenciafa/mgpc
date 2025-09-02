@@ -12,3 +12,46 @@
     background-color: #0056b3;
     transform: translateY(-2px);
 }
+
+/* resources/css/app.css */
+body {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    min-height: 100vh;
+}
+
+.nav-link {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background: rgba(59, 130, 246, 0.1);
+    border-bottom: 2px solid #3b82f6;
+}
+
+.logo-icon {
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.user-avatar {
+    background: linear-gradient(45deg, #10b981, #059669);
+}
+
+.dropdown-menu {
+    backdrop-filter: blur(20px);
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

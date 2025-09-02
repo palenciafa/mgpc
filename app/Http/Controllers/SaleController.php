@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\StockLog;
@@ -13,13 +14,23 @@ class SaleController extends Controller
     public function index()
     {
         $sales = Sale::with('product')->get();
-        return view('sales.index', compact('sales'));
+        $sales = Sale::with('category')->paginate(10); // or get() if you don’t want pagination
+
+        // Fetch all categories for the filter dropdown
+        $categories = Category::all();
+
+        return view('sales.index', compact('sales', 'categories'));
     }
 
     public function create()
     {
         $products = Product::all();
-        return view('sales.create', compact('products'));
+        $categories = Category::all();
+        return view('sales.create', compact('products','categories'));
+
+        // Fetch all categories for the dropdown
+
+
     }
 
     public function store(Request $request)

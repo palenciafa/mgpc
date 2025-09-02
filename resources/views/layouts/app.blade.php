@@ -13,11 +13,13 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('scripts')
 </head>
-<body class="font-sans antialiased">
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-    @include('layouts.navigation')
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
+    <!-- Navigation -->
+    @include('layouts.navigation')
+    
     <!-- Page Heading -->
     @hasSection('header')
         <header class="bg-white dark:bg-gray-800 shadow">
@@ -31,8 +33,34 @@
     <main>
         @yield('content')
     </main>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     @yield('scripts')
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('darkModeToggle');
+    const html = document.documentElement;
+
+    // Apply saved preference on page load
+    if (localStorage.getItem('darkMode') === 'true') {
+        html.classList.add('dark');
+    }
+
+    // Only attach event if button exists
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+
+            // Save preference
+            localStorage.setItem('darkMode', html.classList.contains('dark'));
+        });
+    }
+});
+</script>
+
 </body>
 </html>
