@@ -107,7 +107,7 @@
                                         </svg>
                                         <h3 class="text-slate-400 text-lg font-medium mb-2">No categories found</h3>
                                         <p class="text-slate-500 text-sm mb-4">Get started by creating your first category.</p>
-                                        <a href="{{ route('categories.create') }}" 
+                                        <a href="{{ route('suppliers.create') }}" 
                                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
                                         Add Supplier
                                         </a>
