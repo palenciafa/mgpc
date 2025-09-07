@@ -42,6 +42,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('stock-logs', StockLogController::class);
 });
 
+Route::post('/products/{product}/add-stock', [App\Http\Controllers\ProductController::class, 'addStock'])
+    ->name('products.addStock');
 
 Route::resource('sales', SaleController::class)->middleware('auth');
 Route::get('stock-logs', [StockLogController::class, 'index'])->name('stock_logs.index')->middleware('auth');

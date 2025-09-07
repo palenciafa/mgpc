@@ -10,7 +10,6 @@ class StockLog extends Model
         'product_id',
         'type',
         'quantity',
-        'reason',
         'user_id',
     ];
 

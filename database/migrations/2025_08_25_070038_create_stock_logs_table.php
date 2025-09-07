@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->enum('type', ['in', 'out']); // stock in or out
             $table->integer('quantity');
-            $table->string('reason')->nullable(); // e.g., "initial stock", "sale", "restock"
             $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
 

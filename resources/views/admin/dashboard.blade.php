@@ -28,6 +28,7 @@
             <!-- Live Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 <!-- Products Card -->
+                <a href="{{ route('products.index') }}" class="block">
                 <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:shadow-2xl hover:bg-slate-800/70 transition-all duration-300">
                     <div class="text-center">
                         <div class="flex items-center justify-center mb-3">
@@ -43,8 +44,10 @@
                         <div class="h-2 bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-1000" style="width: {{ $productsCount > 0 ? min($productsCount * 2, 100) : 0 }}%"></div>
                     </div>
                 </div>
+                
 
                 <!-- Suppliers Card -->
+                <a href="{{ route('suppliers.index') }}" class="block">
                 <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:shadow-2xl hover:bg-slate-800/70 transition-all duration-300">
                     <div class="text-center">
                         <div class="flex items-center justify-center mb-3">
@@ -60,8 +63,10 @@
                         <div class="h-2 bg-gradient-to-r from-green-500 to-green-400 rounded-full transition-all duration-1000" style="width: {{ $suppliersCount > 0 ? min($suppliersCount * 2, 100) : 0 }}%"></div>
                     </div>
                 </div>
+                </a>
 
                 <!-- Sales Card -->
+                <a href="{{ route('sales.index') }}" class="block">
                 <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50 hover:shadow-2xl hover:bg-slate-800/70 transition-all duration-300">
                     <div class="text-center">
                         <div class="flex items-center justify-center mb-3">
@@ -78,6 +83,7 @@
                     </div>
                 </div>
             </div>
+            </a>
         </div>
     </div>
 </div>
