@@ -13,8 +13,8 @@ class SaleController extends Controller
 {
     public function index()
     {
-        $sales = Sale::with('product')->get();
-        $sales = Sale::with('category')->paginate(10); // or get() if you don’t want pagination
+        $sales = Sale::with('product.category')->paginate(10);
+ // or get() if you don’t want pagination
 
         // Fetch all categories for the filter dropdown
         $categories = Category::all();
@@ -38,6 +38,7 @@ class SaleController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity'   => 'required|integer|min:1',
+            'customer_name' => 'required|string|max:255',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -60,6 +61,7 @@ class SaleController extends Controller
                 'quantity'    => $request->quantity,
                 'total_price' => $totalPrice,
                 'user_id'     => auth()->id(),
+                'customer_name' => $request->customer_name,
             ]);
 
             // Create Stock Log

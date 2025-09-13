@@ -9,10 +9,31 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'supplier'])->get();
-        return view('products.index', compact('products'));
+        // Start query with eager loading
+        $query = Product::with(['category', 'supplier']);
+
+        // Search filter by product name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Category filter
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Get paginated results (10 per page)
+        $products = $query->paginate(10)->withQueryString();
+
+        // Get all categories for the dropdown
+        $categories = Category::all();
+
+        $lowStockProducts = Product::where('stock', '<', 100)->get();
+        $lowStockCount = $lowStockProducts->count();
+
+        return view('products.index', compact('products', 'categories', 'lowStockProducts', 'lowStockCount'));
     }
 
     public function create()
@@ -51,7 +72,6 @@ class ProductController extends Controller
             'category_id' => 'required',
             'supplier_id' => 'nullable',
             'price' => 'required|numeric',
-            'stock' => 'required|integer',
         ]);
 
         $product->update($validated);
@@ -66,14 +86,13 @@ class ProductController extends Controller
     }
 
     public function addStock(Request $request, Product $product)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:1',
-    ]);
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-    $product->increment('stock', $request->quantity);
+        $product->increment('stock', $request->quantity);
 
-    return redirect()->back()->with('success', 'Stock updated successfully!');
-}
-
+        return redirect()->back()->with('success', 'Stock updated successfully!');
+    }
 }

@@ -3,22 +3,24 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View; 
+use App\Models\Product;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function register()
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
+    public function boot()
     {
-        //
+        // Make low-stock products available in all views
+        View::composer('*', function ($view) {
+            $lowStockProducts = Product::where('stock', '<', 100)->get();
+            $lowStockCount = $lowStockProducts->count();
+
+            $view->with(compact('lowStockProducts', 'lowStockCount'));
+        });
     }
 }

@@ -39,37 +39,38 @@
                 </div>
             @endif
 
-            <!-- Categories Table -->
+            <!-- Filters / Search -->
+            <form method="GET" action="{{ route('products.index') }}"
+                class="flex flex-col md:flex-row items-center justify-between mb-6 space-y-3 md:space-y-0">
+                <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
+                    class="w-full md:w-1/3 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                <div class="flex space-x-2">
+                    <select name="category"
+                        class="px-4 py-2 rounded-lg bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        <option value="">All Categories</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @selected(request('category') == $category->id)>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                        Filter
+                    </button>
+                </div>
+            </form>
+
+            <!-- Products Table -->
             <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-slate-700/50">
                             <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                        </svg>
-                                        Name
-                                    </div>
-                                </th>
-                                <th class="px-6 py-4 text-sm font-semibold text-white text-center align-middle">
-                                    <div class="flex justify-center items-center">
-                                        Stock
-                                    </div>
-                                </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                        </svg>
-                                        Actions
-                                    </div>
-                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Name</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-white text-center align-middle">Stock</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Price</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-700/50">
@@ -99,7 +100,6 @@
                                                 $color = 'border-red-500 text-red-400';
                                             }
                                         @endphp
-
                                         <div class="flex justify-center items-center">
                                             <span class="font-medium px-3 py-1 rounded-lg border {{ $color }}">
                                                 {{ $product->stock }}
@@ -108,7 +108,6 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex space-x-2">
-                                            <!-- Add Stock Button -->
                                             <form action="{{ route('products.addStock', $product) }}" method="POST"
                                                 class="inline-flex items-center space-x-1">
                                                 @csrf
@@ -116,61 +115,43 @@
                                                     class="w-16 px-2 py-1 text-sm border rounded-lg focus:ring focus:border-blue-400" />
                                                 <button type="submit"
                                                     class="bg-green-500/20 hover:bg-green-500/30 text-green-400 px-3 py-2 rounded-lg text-sm flex items-center space-x-1 transition-colors duration-200">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                    <span>Add</span>
+                                                    Add
                                                 </button>
                                             </form>
                                             <a href="{{ route('products.edit', $product) }}"
                                                 class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 px-3 py-2 rounded-lg text-sm flex items-center space-x-1 transition-colors duration-200">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                                <span>Edit</span>
+                                                Edit
                                             </a>
                                             <form action="{{ route('products.destroy', $product) }}" method="POST"
                                                 class="inline">
                                                 @csrf @method('DELETE')
                                                 <button type="submit"
-                                                    onclick="return confirm('Are you sure you want to delete this category?')"
+                                                    onclick="return confirm('Are you sure you want to delete this product?')"
                                                     class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-2 rounded-lg text-sm flex items-center space-x-1 transition-colors duration-200">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    <span>Delete</span>
+                                                    Delete
                                                 </button>
                                             </form>
                                         </div>
                                     </td>
+                                    <td class="px-6 py-4 text-white font-medium">
+                                        ₱{{ number_format($product->price, 2) }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-12 text-center">
-                                        <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-slate-600 mb-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
-                                            <h3 class="text-slate-400 text-lg font-medium mb-2">No products found</h3>
-                                            <p class="text-slate-500 text-sm mb-4">Get started by creating your first product.
-                                            </p>
-                                            <a href="{{ route('products.create') }}"
-                                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-                                                Create Product
-                                            </a>
-                                        </div>
+                                    <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                                        No products found. <a href="{{ route('products.create') }}"
+                                            class="text-blue-400 hover:underline">Create your first product</a>.
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
-
                     </table>
                 </div>
+            </div>
+            <!-- Pagination -->
+            <div class="mt-6">
+                {{ $products->links() }}
             </div>
         </div>
     </div>
