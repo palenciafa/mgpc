@@ -29,7 +29,7 @@
             <!-- Filters / Search -->
             <form method="GET" action="{{ route('sales.index') }}"
                 class="flex flex-col md:flex-row items-center justify-between mb-6 space-y-3 md:space-y-0">
-                <input type="text" name="search" placeholder="Search sales..." value="{{ request('search') }}"
+                <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
                     class="w-full md:w-1/3 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                 <div class="flex space-x-2">
                     <select name="category"
@@ -37,7 +37,8 @@
                         <option value="">All Categories</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" @selected(request('category') == $category->id)>
-                                {{ $category->name }}</option>
+                                {{ $category->name }}
+                            </option>
                         @endforeach
                     </select>
                     <button type="submit"

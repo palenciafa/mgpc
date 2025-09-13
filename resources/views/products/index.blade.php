@@ -70,7 +70,7 @@
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Name</th>
                                 <th class="px-6 py-4 text-sm font-semibold text-white text-center align-middle">Stock</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Price</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Selling Price</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-700/50">

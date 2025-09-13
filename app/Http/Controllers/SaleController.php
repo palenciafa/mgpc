@@ -11,16 +11,31 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
-    public function index()
-    {
-        $sales = Sale::with('product.category')->paginate(10);
- // or get() if you don’t want pagination
+    public function index(Request $request)
+{
+    $query = Sale::with('product.category');
 
-        // Fetch all categories for the filter dropdown
-        $categories = Category::all();
-
-        return view('sales.index', compact('sales', 'categories'));
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('customer_name', 'like', "%{$search}%")
+              ->orWhereHas('product', function ($q) use ($search) {
+                  $q->where('name', 'like', "%{$search}%");
+              });
+        });
     }
+
+    if ($request->filled('category')) {
+        $query->whereHas('product.category', function ($q) use ($request) {
+            $q->where('id', $request->category);
+        });
+    }
+
+    $sales = $query->latest()->paginate(10);
+    $categories = Category::all();
+
+    return view('sales.index', compact('sales', 'categories'));
+}
 
     public function create()
     {

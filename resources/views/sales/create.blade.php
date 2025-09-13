@@ -66,8 +66,7 @@
                     <div>
                         <label for="amount" class="block text-sm font-medium text-white mb-2">Sale Price (₱)</label>
                         <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount') }}" readonly
-                            class="w-full px-4 py-2 rounded-lg bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                            placeholder="Auto-calculated sale price">
+                            class="w-full px-4 py-2 rounded-lg bg-slate-700/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
 
                     <!-- Submit Button -->
