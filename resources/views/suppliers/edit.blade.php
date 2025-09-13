@@ -106,41 +106,6 @@
                 </div>
             </form>
         </div>
-
-        <!-- Danger Zone -->
-        <div class="mt-6 bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-            <div class="flex items-start">
-                <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                <div class="flex-1">
-                    <h4 class="text-red-300 font-medium mb-1">Danger Zone</h4>
-                    <p class="text-red-400 text-sm mb-3">Once you delete a supplier, there is no going back. Please be certain.</p>
-                    <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST" class="inline">
-                        @csrf @method('DELETE')
-                        <button type="submit" 
-                                onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone.')"
-                                class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            <span>Delete Supplier</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Last Updated Info -->
-        <div class="mt-4 text-center">
-            <p class="text-slate-500 text-sm">
-                @if($supplier->updated_at)
-                    Last updated: {{ $supplier->updated_at->format('M d, Y \a\t g:i A') }}
-                @else
-                    Created: {{ $supplier->created_at->format('M d, Y \a\t g:i A') }}
-                @endif
-            </p>
-        </div>
     </div>
 </div>
 @endsection
