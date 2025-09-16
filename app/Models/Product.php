@@ -4,25 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
 class Product extends Model
 {
-    protected $fillable = ['name', 'category_id', 'supplier_id', 'stock', 'price'];
+    protected $fillable = [
+        'name',
+        'description',
+        'category_id',
+        'supplier_id',
+        'stock',
+        'price',
+    ];
 
-    // Define relationship with Category
+    // 🔹 Relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Similarly, if you have suppliers relationship:
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
+
+    public function stockLogs()
+    {
+        return $this->hasMany(StockLog::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    // 🔹 Helper method for adding stock
+    public function addStock($quantity, $userId = null)
+    {
+        $this->increment('stock', $quantity);
+
+        StockLog::create([
+            'product_id' => $this->id,
+            'type'       => 'in',
+            'quantity'   => $quantity,
+            'user_id'    => $userId,
+        ]);
+    }
 }
-
-

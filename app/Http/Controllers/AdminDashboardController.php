@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Sale;
-use App\Models\StockLog; // <- assuming you log stock movements
+use App\Models\StockLog;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
@@ -16,13 +16,14 @@ class AdminDashboardController extends Controller
         $productsCount = Product::count();
         $suppliersCount = Supplier::count();
         $salesCount = Sale::count();
+        $stockLogs = StockLog::all();
 
-        // 👇 fetch top 5 fast moving items (most OUT)
-        $fastMovingItems = StockLog::select('product_id', DB::raw('SUM(quantity) as total_out'))
-            ->where('type', 'out') // assuming you store IN/OUT in StockLog
-            ->groupBy('product_id')
+        // Get top 5 fast moving products with total quantity sold and total sales
+        $fastMovingItems = Product::withSum('sales', 'total_price') // total sales per product
+            ->withCount(['sales as total_out' => function ($query) {
+                $query->select(DB::raw("SUM(quantity)")); // sum of quantity sold
+            }])
             ->orderByDesc('total_out')
-            ->with('product')
             ->take(5)
             ->get();
 
@@ -30,7 +31,8 @@ class AdminDashboardController extends Controller
             'productsCount',
             'suppliersCount',
             'salesCount',
-            'fastMovingItems'
+            'fastMovingItems',
+            'stockLogs',
         ));
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Sale;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\StockLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,47 +12,45 @@ use Illuminate\Support\Facades\DB;
 class SaleController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Sale::with('product.category');
+    {
+        $query = Sale::with('product.category');
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('customer_name', 'like', "%{$search}%")
-              ->orWhereHas('product', function ($q) use ($search) {
-                  $q->where('name', 'like', "%{$search}%");
-              });
-        });
+        // Search by customer name or product name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhereHas('product', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->whereHas('product.category', function ($q) use ($request) {
+                $q->where('id', $request->category);
+            });
+        }
+
+        $sales = $query->latest()->paginate(10)->withQueryString();
+        $products = Product::all();
+        $categories = Category::all();
+
+        return view('sales.index', compact('sales', 'products', 'categories'));
     }
-
-    if ($request->filled('category')) {
-        $query->whereHas('product.category', function ($q) use ($request) {
-            $q->where('id', $request->category);
-        });
-    }
-
-    $sales = $query->latest()->paginate(10);
-    $categories = Category::all();
-
-    return view('sales.index', compact('sales', 'categories'));
-}
 
     public function create()
     {
         $products = Product::all();
-        $categories = Category::all();
-        return view('sales.create', compact('products','categories'));
-
-        // Fetch all categories for the dropdown
-
-
+        return view('sales.create', compact('products'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity'   => 'required|integer|min:1',
+            'product_id'    => 'required|exists:products,id',
+            'quantity'      => 'required|integer|min:1',
             'customer_name' => 'required|string|max:255',
         ]);
 
@@ -63,29 +61,28 @@ class SaleController extends Controller
                 abort(400, 'Not enough stock available.');
             }
 
-            // Compute total price = product price × quantity
             $totalPrice = $product->price * $request->quantity;
 
-            // Deduct stock
-            $product->stock -= $request->quantity;
-            $product->save();
-
-            // Create Sale record
+            // Create Sale
             $sale = Sale::create([
-                'product_id'  => $request->product_id,
-                'quantity'    => $request->quantity,
-                'total_price' => $totalPrice,
-                'user_id'     => auth()->id(),
+                'product_id'    => $product->id,
+                'quantity'      => $request->quantity,
+                'total_price'   => $totalPrice,
+                'user_id'       => auth()->id(),
                 'customer_name' => $request->customer_name,
             ]);
 
-            // Create Stock Log
+            // Deduct stock
+            $product->decrement('stock', $request->quantity);
+
+            // Create OUT StockLog
             StockLog::create([
-                'product_id' => $product->id,
-                'type'       => 'out', // since it's a sale
-                'quantity'   => $request->quantity,
-                'reason'     => 'Sale ID ' . $sale->id,
-                'user_id'    => auth()->id(), // optional, if you want to track the user,
+                'product_id'  => $product->id,
+                'type'        => 'out',
+                'quantity'    => $request->quantity,
+                'user_id'     => auth()->id(),
+                'total_price' => $totalPrice,
+                'sale_id'     => $sale->id,
             ]);
         });
 
@@ -95,5 +92,22 @@ class SaleController extends Controller
     public function show(Sale $sale)
     {
         return view('sales.show', compact('sale'));
+    }
+
+    public function destroy(Sale $sale)
+    {
+        DB::transaction(function () use ($sale) {
+            // Restore stock
+            $product = $sale->product;
+            $product->increment('stock', $sale->quantity);
+
+            // Delete associated OUT stock log
+            StockLog::where('sale_id', $sale->id)->where('type', 'out')->delete();
+
+            // Delete sale
+            $sale->delete();
+        });
+
+        return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }
 }

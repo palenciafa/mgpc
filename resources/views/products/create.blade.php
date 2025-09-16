@@ -92,6 +92,14 @@
                            class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-colors duration-200">
                 </div>
 
+                <!-- Buying Price -->
+<div>
+    <label for="buying_price" class="block text-sm font-medium text-white mb-2">Buying Price</label>
+    <input type="number" name="buying_price" id="buying_price" value="{{ old('buying_price') }}" required min="0" step="0.01"
+           placeholder="Enter product buying price..."
+           class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-colors duration-200">
+</div>
+
                 <!-- Price -->
                 <div>
                     <label for="price" class="block text-sm font-medium text-white mb-2">Price</label>

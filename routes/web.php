@@ -9,7 +9,6 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockLogController;
 use App\Http\Controllers\AdminDashboardController;
 
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -24,31 +23,37 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth'])
     ->name('admin.dashboard');
 
-
-Route::get('/admin/dashboard', [App\Http\Controllers\AdminDashboardController::class, 'index'])
-    ->name('admin.dashboard')
-    ->middleware('auth'); // protect route
+// Profile routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Resource routes
 Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('products', ProductController::class);
     Route::resource('sales', SaleController::class);
-    Route::resource('stock-logs', StockLogController::class);
+
+    // Stock logs resource routes (URLs use hyphens, names use underscores)
+    Route::resource('stock-logs', StockLogController::class)
+        ->only(['index', 'create', 'store', 'destroy'])
+        ->names([
+            'index' => 'stock_logs.index',
+            'create' => 'stock_logs.create',
+            'store' => 'stock_logs.store',
+            'destroy' => 'stock_logs.destroy',
+        ]);
+
+    // Stock logs export
+    Route::get('stock-logs/export', [StockLogController::class, 'export'])
+        ->name('stock_logs.export');
+
+    // Add stock to product
+    Route::post('/products/{product}/add-stock', [ProductController::class, 'addStock'])
+        ->name('products.addStock');
 });
-
-Route::post('/products/{product}/add-stock', [App\Http\Controllers\ProductController::class, 'addStock'])
-    ->name('products.addStock');
-
-Route::resource('sales', SaleController::class)->middleware('auth');
-Route::get('stock-logs', [StockLogController::class, 'index'])->name('stock_logs.index')->middleware('auth');
-
-Route::resource('products', ProductController::class);
-
 
 require __DIR__.'/auth.php';

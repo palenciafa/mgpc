@@ -107,4 +107,24 @@
         productSelect.addEventListener('change', updateAmount);
         quantityInput.addEventListener('input', updateAmount);
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const btn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function(e) {
+        // If button is already disabled, prevent submission
+        if (btn.disabled) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Disable button to prevent multiple clicks
+        btn.disabled = true;
+    });
+});
+</script>
+
+
 @endsection

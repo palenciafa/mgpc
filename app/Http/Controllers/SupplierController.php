@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
@@ -10,7 +9,8 @@ class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::all();
+        // Eager load stock logs with their products
+        $suppliers = Supplier::with('stockLogs.product')->get();
         return view('suppliers.index', compact('suppliers'));
     }
 
@@ -57,7 +57,6 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier)
     {
         $supplier->delete();
-
         return redirect()->route('suppliers.index')->with('success', 'Supplier deleted.');
     }
 }

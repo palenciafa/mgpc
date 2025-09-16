@@ -16,13 +16,12 @@
 <div class="dashboard-container">
     <div class="bg-slate-900/90 px-6 py-8 min-h-screen">
         <div class="text-white">
-            <!-- Page Title -->
             <div class="text-center mb-8">
                 <h1 class="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
                 <p class="text-slate-300 text-lg">Welcome, {{ auth()->user()->name }}</p>
             </div>
-            
-            <!-- Stats Cards -->
+
+            <!-- Dashboard Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 <!-- Products -->
                 <a href="{{ route('products.index') }}" class="block">
@@ -73,28 +72,76 @@
                 </a>
             </div>
 
-            {{-- Fast Moving Items Section --}}
-            <h2 class="mt-10 text-xl font-bold">📈 Fast Moving Items (Most OUT)</h2>
-            <canvas id="fastMovingChart" height="120"></canvas>
+            <!-- Total Stock Price IN vs OUT -->
+            <h2 class="mt-10 mb-6 text-xl font-bold text-center">Total Price of Stock IN and OUT</h2>
+            <div class="flex flex-col md:flex-row gap-6 items-start justify-center mb-8 max-w-6xl mx-auto">
+                <!-- Chart -->
+                <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6 flex-1">
+                    <canvas id="stockPriceChart" height="200"></canvas>
+                </div>
+                <!-- Table -->
+                <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6 flex-1 overflow-x-auto">
+                    <table class="table-auto w-full text-white">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 text-left">Type</th>
+                                <th class="px-4 py-2 text-left">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-2">Purchase (IN)</td>
+                                <td class="px-4 py-2">₱{{ number_format($stockLogs->where('type', 'in')->sum('buying_price'), 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2">Sale (OUT)</td>
+                                <td class="px-4 py-2">₱{{ number_format($stockLogs->where('type', 'out')->sum('total_price'), 2) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <table class="table table-striped mt-3 text-white">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Total Out</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($fastMovingItems as $item)
-                        <tr>
-                            <td>{{ $item->product->name }}</td>
-                            <td>{{ $item->total_out }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="2">No fast moving items yet.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <!-- Fast Moving Items -->
+            <h2 class="mt-10 mb-6 text-xl font-bold text-center">Fast Moving Items (Most OUT)</h2>
+            <div class="flex flex-col md:flex-row gap-6 items-start justify-center mb-8 max-w-6xl mx-auto">
+                <!-- Chart -->
+                <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6 flex-1">
+                    <canvas id="fastMovingChart" height="200"></canvas>
+                </div>
+                <!-- Table -->
+                <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6 flex-1 overflow-x-auto">
+                    <table class="table-auto w-full text-white">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 text-left">Product</th>
+                                <th class="px-4 py-2 text-left">Total Quantity Out</th>
+                                <th class="px-4 py-2 text-left">Total Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($fastMovingItems as $item)
+                                <tr>
+                                    <td class="px-4 py-2">{{ $item->name }}</td>
+                                    <td class="px-4 py-2">{{ $item->total_out }}</td>
+                                    <td class="px-4 py-2">₱{{ number_format($item->sales_sum_total_price, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="px-4 py-2">No fast moving items yet.</td></tr>
+                            @endforelse
+
+                            @if($fastMovingItems->count() > 0)
+                                <tr class="font-bold border-t border-slate-600">
+                                    <td class="px-4 py-2">Total</td>
+                                    <td class="px-4 py-2">{{ $fastMovingItems->sum('total_out') }}</td>
+                                    <td class="px-4 py-2">₱{{ number_format($fastMovingItems->sum('sales_sum_total_price'), 2) }}</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -122,16 +169,56 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCount();
     });
 
-    // Chart.js
-    const ctx = document.getElementById('fastMovingChart').getContext('2d');
-    new Chart(ctx, {
+    // Stock Price Chart
+    const ctxStock = document.getElementById('stockPriceChart').getContext('2d');
+    new Chart(ctxStock, {
         type: 'bar',
         data: {
-            labels: @json($fastMovingItems->pluck('product.name')),
+            labels: ['Purchase', 'Sale'],
             datasets: [{
-                label: 'Total Out',
+                label: 'Total Price',
+                data: [
+                    {{ $stockLogs->where('type', 'in')->sum('buying_price') }},
+                    {{ $stockLogs->where('type', 'out')->sum('total_price') }}
+                ],
+                backgroundColor: ['rgba(239,68,68,0.7)','rgba(34,197,94,0.7)'],
+                borderColor: ['rgba(239,68,68,1)','rgba(34,197,94,1)'],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    bodyColor: 'white',
+                    titleColor: 'white',
+                    backgroundColor: '#1e293b',
+                    callbacks: {
+                        label: function(context) {
+                            return `₱${context.raw.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+        }
+    });
+
+    // Fast Moving Items Chart
+    const ctxFast = document.getElementById('fastMovingChart').getContext('2d');
+    new Chart(ctxFast, {
+        type: 'bar',
+        data: {
+            labels: @json($fastMovingItems->pluck('name')),
+            datasets: [{
+                label: 'Total Quantity Out',
                 data: @json($fastMovingItems->pluck('total_out')),
-                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                backgroundColor: 'rgba(255, 99, 132, 0.7)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
                 borderRadius: 6
@@ -141,12 +228,21 @@ document.addEventListener('DOMContentLoaded', () => {
             responsive: true,
             plugins: {
                 legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Top Fast Moving Items'
+                tooltip: {
+                    bodyColor: 'white',
+                    titleColor: 'white',
+                    backgroundColor: '#1e293b',
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toLocaleString();
+                        }
+                    }
                 }
             },
-            scales: { y: { beginAtZero: true } }
+            scales: {
+                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' }, barPercentage: 0.6, categoryPercentage: 0.5 },
+                y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
         }
     });
 });

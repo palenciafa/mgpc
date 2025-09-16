@@ -8,4 +8,10 @@ class Supplier extends Model
 {
     protected $fillable = ['name', 'contact', 'email', 'address'];
 
+    public function stockLogs()
+{
+    return $this->hasMany(StockLog::class);
 }
+
+}
+
