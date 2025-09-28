@@ -55,6 +55,12 @@ Route::middleware(['auth'])->group(function () {
     // Add stock to product
     Route::post('/products/{product}/add-stock', [ProductController::class, 'addStock'])
         ->name('products.addStock');
+        
+    // Logout route (post)
+    Route::post('/logout', function () {
+        Auth::logout();  // Logs out the user
+        return redirect('/');  // Redirect to homepage or login page
+    })->name('logout');
 });
 
 require __DIR__ . '/auth.php';
