@@ -33,7 +33,8 @@ Route::middleware('auth')->group(function () {
 // Resource routes
 Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class);
-    Route::resource('suppliers', SupplierController::class);
+    Route::resource('suppliers', SupplierController::class)
+        ->middleware('role:owner');
     Route::resource('products', ProductController::class);
     Route::resource('sales', SaleController::class);
 
@@ -56,4 +57,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('products.addStock');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

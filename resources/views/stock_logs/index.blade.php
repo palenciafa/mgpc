@@ -35,10 +35,11 @@
 
                 <!-- Export Button -->
                 <div class="text-right">
-                    <a href="{{ route('stock_logs.export') }}" 
-                       class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200">
-                        Export to Excel
-                    </a>
+                    <a href="{{ route('stock_logs.export', request()->query()) }}" 
+   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200">
+    Export to Excel
+</a>
+
                 </div>
             </div>
 

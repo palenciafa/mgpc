@@ -33,10 +33,12 @@
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                             Categories
                         </a>
-                        <a href="/suppliers"
-                            class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
-                            Suppliers
-                        </a>
+                        @if(auth()->check() && auth()->user()->role === 'owner')
+                            <a href="/suppliers"
+                                class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+                                Suppliers
+                            </a>
+                        @endif
                         <a href="/products"
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                             Products
@@ -88,7 +90,8 @@
                                 @forelse($lowStockProducts as $product)
                                     <li class="px-4 py-2 hover:bg-slate-700/50 transition-colors flex justify-between">
                                         <span>{{ $product->name }}</span>
-                                        <span class="{{ $product->stock >= 50 ? 'text-yellow-400' : 'text-red-400' }}">{{ $product->stock }}</span>
+                                        <span
+                                            class="{{ $product->stock >= 50 ? 'text-yellow-400' : 'text-red-400' }}">{{ $product->stock }}</span>
                                     </li>
                                 @empty
                                     <li class="px-4 py-2 text-slate-400">No low-stock products</li>
@@ -244,21 +247,21 @@
             </div>
         </div>
     </nav>
-<script>
-    const notifBtn = document.getElementById('notifBtn');
-    const notifDropdown = document.getElementById('notifDropdown');
+    <script>
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
 
-    notifBtn.addEventListener('click', () => {
-        notifDropdown.classList.toggle('hidden');
-    });
+        notifBtn.addEventListener('click', () => {
+            notifDropdown.classList.toggle('hidden');
+        });
 
-    // Click outside to close
-    document.addEventListener('click', function(event) {
-        if (!notifBtn.contains(event.target) && !notifDropdown.contains(event.target)) {
-            notifDropdown.classList.add('hidden');
-        }
-    });
-</script>
+        // Click outside to close
+        document.addEventListener('click', function (event) {
+            if (!notifBtn.contains(event.target) && !notifDropdown.contains(event.target)) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>
