@@ -19,7 +19,7 @@
                     <div class="logo-icon">
                         M
                     </div>
-                    <a href="/admin" class="text-xl font-bold text-white tracking-tight">
+                    <a href="/admin/dashboard" class="text-xl font-bold text-white tracking-tight">
                         MGPC Company
                     </a>
 
@@ -56,17 +56,7 @@
 
                 <!-- Right Side Icons & User -->
                 <div class="hidden lg:flex lg:items-center lg:space-x-4">
-
-                    <!-- Messages Icon -->
-                    <button
-                        class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 8l7.89 3.26a2 2 0 001.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                    </button>
-
-                    <div class="relative">
+                    <div class="relative [9999]">
                         <button id="notifBtn"
                             class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all duration-200 relative">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,15 +73,17 @@
 
                         <!-- Dropdown -->
                         <div id="notifDropdown"
-                            class="absolute right-0 mt-2 w-72 bg-slate-800/90 rounded-lg shadow-lg overflow-hidden hidden z-50">
-                            <div class="p-4 text-white font-medium border-b border-slate-700/50">Low Stock Products
+                            class="absolute right-0 mt-2 w-72 bg-slate-800/90 rounded-lg shadow-lg overflow-hidden hidden z-[9999]">
+                            <div class="p-4 text-white font-medium border-b border-slate-700/50">
+                                Low Stock Products
                             </div>
-                            <ul class="text-white">
+                            <ul class="text-white max-h-60 overflow-y-auto">
                                 @forelse($lowStockProducts as $product)
                                     <li class="px-4 py-2 hover:bg-slate-700/50 transition-colors flex justify-between">
                                         <span>{{ $product->name }}</span>
-                                        <span
-                                            class="{{ $product->stock >= 50 ? 'text-yellow-400' : 'text-red-400' }}">{{ $product->stock }}</span>
+                                        <span class="{{ $product->stock >= 50 ? 'text-yellow-400' : 'text-red-400' }}">
+                                            {{ $product->stock }}
+                                        </span>
                                     </li>
                                 @empty
                                     <li class="px-4 py-2 text-slate-400">No low-stock products</li>
@@ -99,15 +91,10 @@
                             </ul>
                         </div>
                     </div>
-
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ dropdownOpen: false }">
                         <button @click="dropdownOpen = !dropdownOpen"
                             class="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-800/50 transition-all duration-200">
-                            <div
-                                class="user-avatar w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                                J
-                            </div>
                             <span class="text-sm font-medium text-white">Admin</span>
                             <svg class="ml-1 w-4 h-4 text-slate-400" :class="{ 'rotate-180': dropdownOpen }" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -122,32 +109,6 @@
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             @click.away="dropdownOpen = false"
                             class="dropdown-menu absolute right-0 mt-2 w-64 rounded-xl shadow-xl py-2 z-50">
-
-                            <!-- <div class="px-4 py-3 border-b border-slate-600/50">
-                                <div class="flex items-center space-x-3">
-                                    <div class="user-avatar w-10 h-10 rounded-lg flex items-center justify-center text-white font-medium">
-                                        J
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-white">John Doe</p>
-                                        <p class="text-xs text-slate-400">john@mgpccompany.com</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <a href="/profile" class="flex items-center px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors">
-                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                Profile Settings
-                            </a>
-                            <a href="/settings" class="flex items-center px-4 py-3 text-sm text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors">
-                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Account Settings
-                            </a> -->
                             <div class="border-t border-slate-600/50 mt-2 pt-2">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -164,11 +125,6 @@
 
                         </div>
                     </div>
-                    <!-- Dark Mode Toggle -->
-                    <button id="darkModeToggle"
-                        class="ml-4 px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        🌙 / ☀️
-                    </button>
                     <script>
                         document.addEventListener('DOMContentLoaded', () => {
                             const toggle = document.getElementById('darkModeToggle');
@@ -230,24 +186,6 @@
                     class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                     Stock Logs
                 </a>
-
-                <!-- <div class="border-t border-slate-700/50 mt-4 pt-4">
-                    <div class="flex items-center space-x-3 px-3 py-2">
-                        <div class="user-avatar w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                            J
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-white">John Doe</p>
-                            <p class="text-xs text-slate-400">john@mgpccompany.com</p>
-                        </div>
-                    </div>
-                    <a href="/profile" class="block px-3 py-2 mt-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800/50">
-                        Profile Settings
-                    </a>
-                    <button class="block w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800/50">
-                        Sign Out
-                    </button>
-                </div> -->
             </div>
         </div>
     </nav>

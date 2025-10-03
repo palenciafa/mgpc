@@ -125,7 +125,33 @@
                     </div>
                 </div>
 
+                <!-- Profit Chart -->
+                <h2 class="mt-10 mb-6 text-xl font-bold text-center">Profit Overview</h2>
+                <div class="max-w-6xl mx-auto mb-8">
+                    <div class="flex flex-col md:flex-row items-center justify-end gap-3 mb-3">
+                        <select id="profitFilter"
+                            class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2">
+                            <option value="daily">Daily (Last 7 Days)</option>
+                            <option value="monthly">Monthly (Last 12 Months)</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
 
+                        <!-- Custom Range Inputs (hidden by default) -->
+                        <div id="customRangeInputs" class="hidden flex gap-2">
+                            <input type="date" id="startDate"
+                                class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2">
+                            <input type="date" id="endDate"
+                                class="bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2">
+                            <button id="applyRange"
+                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg">Apply</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-6">
+                        <canvas id="profitChart" height="200"></canvas>
+                    </div>
+                </div>
                 <!-- Fast Moving Items -->
                 <h2 class="mt-10 mb-6 text-xl font-bold text-center">Fast Moving Items (Most OUT)</h2>
                 <div class="flex flex-col md:flex-row gap-6 items-start justify-center mb-8 max-w-6xl mx-auto">
@@ -206,7 +232,7 @@
                     datasets: [{
                         label: 'Total Price',
                         data: [
-                        {{ $stockLogs->where('type', 'in')->sum('buying_price') }},
+                                                    {{ $stockLogs->where('type', 'in')->sum('buying_price') }},
                             {{ $stockLogs->where('type', 'out')->sum('total_price') }}
                         ],
                         backgroundColor: ['rgba(239,68,68,0.7)', 'rgba(34,197,94,0.7)'],
@@ -272,6 +298,97 @@
                         y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
                     }
                 }
+            });
+            // Profit Chart
+            const ctxProfit = document.getElementById('profitChart').getContext('2d');
+
+            let profitData = {
+                daily: {
+                    labels: @json($dailyProfit->pluck('date')),
+                    data: @json($dailyProfit->pluck('profit'))
+                },
+                monthly: {
+                    labels: @json($monthlyProfit->pluck('month')),
+                    data: @json($monthlyProfit->pluck('profit'))
+                },
+                yearly: {
+                    labels: @json($yearlyProfit->pluck('year')),
+                    data: @json($yearlyProfit->pluck('profit'))
+                },
+                custom: { labels: [], data: [] }
+            };
+
+            let profitChart = new Chart(ctxProfit, {
+                type: 'line',
+                data: {
+                    labels: profitData.daily.labels,
+                    datasets: [{
+                        label: 'Profit',
+                        data: profitData.daily.data,
+                        borderColor: 'rgba(34,197,94,1)',
+                        backgroundColor: 'rgba(34,197,94,0.3)',
+                        fill: true,
+                        tension: 0.2,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: 'white' } },
+                        tooltip: {
+                            bodyColor: 'white',
+                            titleColor: 'white',
+                            backgroundColor: '#1e293b',
+                            callbacks: {
+                                label: (context) => `₱${context.raw.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
+                }
+            });
+
+            // Filter handling
+            document.getElementById('profitFilter').addEventListener('change', function () {
+                let type = this.value;
+
+                if (type === 'custom') {
+                    document.getElementById('customRangeInputs').classList.remove('hidden');
+                } else {
+                    document.getElementById('customRangeInputs').classList.add('hidden');
+                    profitChart.data.labels = profitData[type].labels;
+                    profitChart.data.datasets[0].data = profitData[type].data;
+                    profitChart.update();
+                }
+            });
+
+            // Apply custom date range
+            document.getElementById('applyRange').addEventListener('click', () => {
+                let start = document.getElementById('startDate').value;
+                let end = document.getElementById('endDate').value;
+
+                if (!start || !end) {
+                    alert("Please select both start and end dates.");
+                    return;
+                }
+
+                fetch(`{{ route('api.profit') }}?start=${start}&end=${end}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        profitData.custom.labels = data.labels;
+                        profitData.custom.data = data.values;
+
+                        profitChart.data.labels = profitData.custom.labels;
+                        profitChart.data.datasets[0].data = profitData.custom.data;
+                        profitChart.update();
+                    })
+                    .catch(err => console.error("Error fetching profit data:", err));
             });
         });
     </script>
