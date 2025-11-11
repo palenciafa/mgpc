@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
@@ -37,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:owner');
     Route::resource('products', ProductController::class);
     Route::resource('sales', SaleController::class);
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('equipments', EquipmentController::class);
 
     // Stock logs resource routes (URLs use hyphens, names use underscores)
     Route::resource('stock-logs', StockLogController::class)

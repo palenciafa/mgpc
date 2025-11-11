@@ -16,18 +16,15 @@
             <div class="flex justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-4">
-                    <div class="logo-icon">
-                        M
-                    </div>
                     <a href="/admin/dashboard" class="text-xl font-bold text-white tracking-tight">
                         MGPC Company
                     </a>
 
                     <!-- Navigation Links -->
                     <div class="hidden lg:flex lg:ml-12 space-x-1">
-                        <a href="/admin/dashboard"
+                        <a href="/employees"
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
-                            Dashboard
+                            Employees
                         </a>
                         <a href="/categories"
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
@@ -42,6 +39,10 @@
                         <a href="/products"
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                             Products
+                        </a>
+                        <a href="/equipments"
+                            class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+                            Equipments
                         </a>
                         <a href="/sales"
                             class="nav-link px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
