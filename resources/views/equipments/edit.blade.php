@@ -45,13 +45,14 @@
 
         <!-- Form Card -->
         <div class="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 p-8">
+
             <!-- Equipment Info Header -->
             <div class="flex items-center mb-6 pb-6 border-b border-slate-700/50">
                 <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
                     <span class="text-white font-bold text-lg">{{ strtoupper(substr($equipment->name, 0, 2)) }}</span>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold text-white">{{ $equipment->name }}</h3>
+                    <h3 class="text-xl font-semibold text-white">{{ $equipment->brand }} - {{ $equipment->name }}</h3>
                     <p class="text-slate-400 text-sm">Control #: {{ $equipment->control_number }}</p>
                 </div>
             </div>
@@ -59,7 +60,16 @@
             <form action="{{ route('equipments.update', $equipment) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
-                
+
+                <!-- Brand -->
+                <div>
+                    <label for="brand" class="block text-sm font-medium text-white mb-3">Brand</label>
+                    <input type="text" name="brand" id="brand" required
+                           value="{{ old('brand', $equipment->brand) }}"
+                           placeholder="Enter brand..."
+                           class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-colors duration-200">
+                </div>
+
                 <!-- Equipment Name -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-white mb-3">Equipment Name</label>
@@ -82,6 +92,18 @@
                         @endforeach
                     </select>
                 </div>
+
+                <!-- Status -->
+<div>
+    <label for="status" class="block text-sm font-medium text-white mb-2">Status</label>
+    <select name="status" id="status" class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white">
+        @php $statuses = ['good condition','bad condition','for repair','lost']; @endphp
+        @foreach ($statuses as $s)
+            <option value="{{ $s }}" {{ old('status', $equipment->status) == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+        @endforeach
+    </select>
+</div>
+
 
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700/50">

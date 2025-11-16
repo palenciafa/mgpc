@@ -13,11 +13,12 @@ class EquipmentController extends Controller
     {
         $query = Equipment::with('employee')->latest();
 
-        // If there's a search term, filter by name or control number
+        // If there's a search term, filter by name, brand, or control number
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%")
                   ->orWhere('control_number', 'like', "%{$search}%");
             });
         }
@@ -38,8 +39,10 @@ class EquipmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'brand' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'employee_id' => 'nullable|exists:employees,id',
+            'status' => 'required|in:good condition,bad condition,for repair,lost',
         ]);
 
         // Get current year and month
@@ -64,8 +67,10 @@ class EquipmentController extends Controller
         // Create new equipment record
         Equipment::create([
             'control_number' => $controlNumber,
+            'brand' => $request->brand,
             'name' => $request->name,
             'employee_id' => $request->employee_id,
+            'status' => $request->status, // Save the selected status
         ]);
 
         return redirect()->route('equipments.index')->with('success', 'Equipment added successfully!');
@@ -82,13 +87,17 @@ class EquipmentController extends Controller
     public function update(Request $request, Equipment $equipment)
     {
         $request->validate([
+            'brand' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'employee_id' => 'nullable|exists:employees,id',
+            'status' => 'required|in:good condition,bad condition,for repair,lost',
         ]);
 
         $equipment->update([
+            'brand' => $request->brand,
             'name' => $request->name,
             'employee_id' => $request->employee_id,
+            'status' => $request->status, // Update the selected status
         ]);
 
         return redirect()->route('equipments.index')->with('success', 'Equipment updated successfully!');

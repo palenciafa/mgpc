@@ -9,12 +9,14 @@ class Equipment extends Model
 {
     use HasFactory;
 
-    protected $table = 'equipments'; // explicitly tell Laravel the table name
+    protected $table = 'equipments';
 
     protected $fillable = [
         'control_number',
+        'brand',        
         'name',
         'employee_id',
+        'status',
     ];
 
     public function employee()
