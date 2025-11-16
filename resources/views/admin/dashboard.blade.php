@@ -109,17 +109,22 @@
                                     $profit = $sale - $purchase;
                                 @endphp
                                 <tr>
-                                    <td class="px-4 py-2">Purchase (IN)</td>
-                                    <td class="px-4 py-2">₱{{ number_format($purchase, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-2">Sale (OUT)</td>
-                                    <td class="px-4 py-2">₱{{ number_format($sale, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-2 font-bold">Profit</td>
-                                    <td class="px-4 py-2 font-bold text-green-400">₱{{ number_format($profit, 2) }}</td>
-                                </tr>
+    <td class="px-4 py-2">Purchase (IN)</td>
+    <td class="px-4 py-2">₱{{ number_format($purchase, 2) }}</td>
+</tr>
+<tr>
+    <td class="px-4 py-2">Sale (OUT)</td>
+    <td class="px-4 py-2">₱{{ number_format($sale, 2) }}</td>
+</tr>
+<tr>
+    <td class="px-4 py-2 font-bold">Profit</td>
+
+    <td class="px-4 py-2 font-bold 
+        {{ $profit < 0 ? 'text-red-400' : 'text-green-400' }}">
+        ₱{{ number_format($profit, 2) }}
+    </td>
+</tr>
+
                             </tbody>
                         </table>
                     </div>
