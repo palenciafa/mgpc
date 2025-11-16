@@ -300,59 +300,81 @@
                 }
             });
             // Profit Chart
-            const ctxProfit = document.getElementById('profitChart').getContext('2d');
+            // Profit Chart
+const ctxProfit = document.getElementById('profitChart').getContext('2d');
 
-            let profitData = {
-                daily: {
-                    labels: @json($dailyProfit->pluck('date')),
-                    data: @json($dailyProfit->pluck('profit'))
-                },
-                monthly: {
-                    labels: @json($monthlyProfit->pluck('month')),
-                    data: @json($monthlyProfit->pluck('profit'))
-                },
-                yearly: {
-                    labels: @json($yearlyProfit->pluck('year')),
-                    data: @json($yearlyProfit->pluck('profit'))
-                },
-                custom: { labels: [], data: [] }
-            };
+let profitData = {
+    daily: {
+        labels: @json($dailyProfit->pluck('date')),
+        data: @json($dailyProfit->pluck('profit'))
+    },
+    monthly: {
+        labels: @json($monthlyProfit->pluck('month')),
+        data: @json($monthlyProfit->pluck('profit'))
+    },
+    yearly: {
+        labels: @json($yearlyProfit->pluck('year')),
+        data: @json($yearlyProfit->pluck('profit'))
+    },
+    custom: { labels: [], data: [] }
+};
 
-            let profitChart = new Chart(ctxProfit, {
-                type: 'line',
-                data: {
-                    labels: profitData.daily.labels,
-                    datasets: [{
-                        label: 'Profit',
-                        data: profitData.daily.data,
-                        borderColor: 'rgba(34,197,94,1)',
-                        backgroundColor: 'rgba(34,197,94,0.3)',
-                        fill: true,
-                        tension: 0.2,
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { labels: { color: 'white' } },
-                        tooltip: {
-                            bodyColor: 'white',
-                            titleColor: 'white',
-                            backgroundColor: '#1e293b',
-                            callbacks: {
-                                label: (context) => `₱${context.raw.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
-                    }
+let profitChart = new Chart(ctxProfit, {
+    type: 'line',
+    data: {
+        labels: profitData.daily.labels,
+        datasets: [{
+            label: 'Profit',
+            data: profitData.daily.data,
+            borderColor: 'rgba(34,197,94,1)',
+            backgroundColor: 'transparent',
+            fill: false,
+            tension: 0.2,
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+
+            segment: {
+                borderColor: ctx => {
+                    const curr = ctx.p0.parsed.y;
+                    const next = ctx.p1.parsed.y;
+                    return (curr < 0 || next < 0)
+                        ? 'rgba(239,68,68,1)'
+                        : 'rgba(34,197,94,1)';
                 }
-            });
+            },
+
+            pointBackgroundColor: ctx =>
+                ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
+
+            pointBorderColor: ctx =>
+                ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
+
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }, 
+            tooltip: {
+                bodyColor: 'white',
+                titleColor: 'white',
+                backgroundColor: '#1e293b',
+                callbacks: {
+                    label: (context) =>
+                        `₱${context.raw.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                }
+            }
+        },
+        scales: {
+            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+            y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+        }
+    }
+});
+
+
 
             // Filter handling
             document.getElementById('profitFilter').addEventListener('change', function () {
