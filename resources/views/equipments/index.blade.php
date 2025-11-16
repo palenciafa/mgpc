@@ -35,7 +35,6 @@
                 </div>
             </form>
 
-
             <!-- Success Message -->
             @if(session('success'))
                 <div class="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-3 rounded-lg mb-6">
