@@ -314,15 +314,31 @@ let profitData = {
         data: @json($dailyProfit->pluck('profit'))
     },
     monthly: {
-        labels: @json($monthlyProfit->pluck('month')),
-        data: @json($monthlyProfit->pluck('profit'))
+    labels: @json($monthlyProfitFull->pluck('month')),
+    data: @json($monthlyProfitFull->pluck('profit'))
     },
     yearly: {
-        labels: @json($yearlyProfit->pluck('year')),
-        data: @json($yearlyProfit->pluck('profit'))
+        labels: @json($yearlyProfitFull->pluck('year')),
+        data: @json($yearlyProfitFull->pluck('profit'))
     },
+
     custom: { labels: [], data: [] }
 };
+
+// debug: show what's preloaded (open browser console)
+console.log('preloaded profitData', profitData);
+
+// Format monthly labels from "YYYY-MM" to "Mon 'YY" (e.g. Feb '25)
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+if (profitData.monthly.labels && profitData.monthly.labels.length) {
+    profitData.monthly.labels = profitData.monthly.labels.map(m => {
+        const parts = (m || '').split('-');
+        if (parts.length !== 2) return m;
+        const y = parts[0];
+        const mm = parseInt(parts[1], 10) - 1;
+        return `${monthNames[mm]} '${String(y).slice(2)}`;
+    });
+}
 
 let profitChart = new Chart(ctxProfit, {
     type: 'line',
@@ -389,9 +405,35 @@ let profitChart = new Chart(ctxProfit, {
                     document.getElementById('customRangeInputs').classList.remove('hidden');
                 } else {
                     document.getElementById('customRangeInputs').classList.add('hidden');
-                    profitChart.data.labels = profitData[type].labels;
-                    profitChart.data.datasets[0].data = profitData[type].data;
-                    profitChart.update();
+                    // if preloaded data is empty, fetch grouped data from API
+                    if (!profitData[type].labels || profitData[type].labels.length === 0) {
+                        fetch(`{{ route('api.profit') }}?group=${type}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                // If monthly, format YYYY-MM => Mon 'YY
+                                if (type === 'monthly' && data.labels && data.labels.length) {
+                                    data.labels = data.labels.map(m => {
+                                        const parts = (m || '').split('-');
+                                        if (parts.length !== 2) return m;
+                                        const y = parts[0];
+                                        const mm = parseInt(parts[1], 10) - 1;
+                                        return `${monthNames[mm]} '${String(y).slice(2)}`;
+                                    });
+                                }
+
+                                profitData[type].labels = data.labels;
+                                profitData[type].data = data.values;
+
+                                profitChart.data.labels = profitData[type].labels;
+                                profitChart.data.datasets[0].data = profitData[type].data;
+                                profitChart.update();
+                            })
+                            .catch(err => console.error('Error fetching grouped profit data:', err));
+                    } else {
+                        profitChart.data.labels = profitData[type].labels;
+                        profitChart.data.datasets[0].data = profitData[type].data;
+                        profitChart.update();
+                    }
                 }
             });
 
