@@ -109,4 +109,27 @@ class EquipmentController extends Controller
         $equipment->delete();
         return redirect()->route('equipments.index')->with('success', 'Equipment deleted successfully!');
     }
+
+    // Add this at the end of your EquipmentController, before the closing }
+public function uploadImage(Request $request, Equipment $equipment)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpg,jpeg,png|max:4096', // max 4MB
+    ]);
+
+    // Delete old image if exists
+    if ($equipment->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($equipment->image)) {
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($equipment->image);
+    }
+
+    // Store new image
+    $filePath = $request->file('image')->store('equipment_images', 'public');
+
+    // Save path to equipment
+    $equipment->image = $filePath;
+    $equipment->save();
+
+    return redirect()->route('equipments.index')->with('success', 'Image uploaded successfully!');
+}
+
 }

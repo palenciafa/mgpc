@@ -84,6 +84,64 @@
                         </div>
                     </a>
                 </div>
+                <!-- Equipment Status Overview -->
+                <h2 class="mt-10 mb-6 text-xl font-bold text-center">Equipment Status Overview</h2>
+                <div class="flex flex-col md:flex-row flex-wrap justify-center gap-6 max-w-6xl mx-auto mb-8">
+                    @php
+                        $statusColors = [
+                            'good condition' => 'bg-green-500',
+                            'bad condition' => 'bg-red-500',
+                            'for repair' => 'bg-yellow-500',
+                            'lost' => 'bg-gray-500',
+                        ];
+
+                        $totalEquipments = $equipmentStatusCounts->sum();
+                    @endphp
+
+                    @forelse($equipmentStatusCounts as $status => $count)
+                        @php
+                            $percentage = $totalEquipments > 0 ? ($count / $totalEquipments) * 100 : 0;
+                        @endphp
+                        <div class="w-64 bg-slate-800/50 rounded-lg border border-slate-700/50 overflow-hidden shadow-lg">
+                            <div class="px-4 py-3 flex justify-between items-center">
+                                <span class="font-semibold text-white">{{ ucfirst($status) }}</span>
+                                <span class="font-bold text-white counter" data-target="{{ $count }}">0</span>
+                            </div>
+                            <div class="h-4 bg-slate-700">
+                                <div class="h-4 {{ $statusColors[$status] ?? 'bg-slate-500' }} transition-all duration-500"
+                                    style="width: {{ $percentage }}%"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="px-4 py-2 rounded-lg bg-slate-600 text-white flex items-center justify-center">
+                            No equipment data
+                        </div>
+                    @endforelse
+                </div>
+
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            // Animate counters
+                            const counters = document.querySelectorAll('.counter');
+                            counters.forEach(counter => {
+                                const updateCount = () => {
+                                    const target = +counter.getAttribute('data-target');
+                                    const count = +counter.innerText;
+                                    const increment = target / 50;
+                                    if (count < target) {
+                                        counter.innerText = Math.ceil(count + increment);
+                                        setTimeout(updateCount, 20);
+                                    } else {
+                                        counter.innerText = target;
+                                    }
+                                };
+                                updateCount();
+                            });
+                        });
+                    </script>
+                @endpush
+
 
                 <!-- Total Stock Price IN vs OUT -->
                 <h2 class="mt-10 mb-6 text-xl font-bold text-center">Total Price of Stock IN and OUT</h2>
@@ -109,21 +167,21 @@
                                     $profit = $sale - $purchase;
                                 @endphp
                                 <tr>
-    <td class="px-4 py-2">Purchase (IN)</td>
-    <td class="px-4 py-2">₱{{ number_format($purchase, 2) }}</td>
-</tr>
-<tr>
-    <td class="px-4 py-2">Sale (OUT)</td>
-    <td class="px-4 py-2">₱{{ number_format($sale, 2) }}</td>
-</tr>
-<tr>
-    <td class="px-4 py-2 font-bold">Profit</td>
+                                    <td class="px-4 py-2">Purchase (IN)</td>
+                                    <td class="px-4 py-2">₱{{ number_format($purchase, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">Sale (OUT)</td>
+                                    <td class="px-4 py-2">₱{{ number_format($sale, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 font-bold">Profit</td>
 
-    <td class="px-4 py-2 font-bold 
-        {{ $profit < 0 ? 'text-red-400' : 'text-green-400' }}">
-        ₱{{ number_format($profit, 2) }}
-    </td>
-</tr>
+                                    <td class="px-4 py-2 font-bold 
+                    {{ $profit < 0 ? 'text-red-400' : 'text-green-400' }}">
+                                        ₱{{ number_format($profit, 2) }}
+                                    </td>
+                                </tr>
 
                             </tbody>
                         </table>
@@ -237,7 +295,7 @@
                     datasets: [{
                         label: 'Total Price',
                         data: [
-                                                    {{ $stockLogs->where('type', 'in')->sum('buying_price') }},
+                                                                {{ $stockLogs->where('type', 'in')->sum('buying_price') }},
                             {{ $stockLogs->where('type', 'out')->sum('total_price') }}
                         ],
                         backgroundColor: ['rgba(239,68,68,0.7)', 'rgba(34,197,94,0.7)'],
@@ -306,94 +364,78 @@
             });
             // Profit Chart
             // Profit Chart
-const ctxProfit = document.getElementById('profitChart').getContext('2d');
+            const ctxProfit = document.getElementById('profitChart').getContext('2d');
 
-let profitData = {
-    daily: {
-        labels: @json($dailyProfit->pluck('date')),
-        data: @json($dailyProfit->pluck('profit'))
-    },
-    monthly: {
-    labels: @json($monthlyProfitFull->pluck('month')),
-    data: @json($monthlyProfitFull->pluck('profit'))
-    },
-    yearly: {
-        labels: @json($yearlyProfitFull->pluck('year')),
-        data: @json($yearlyProfitFull->pluck('profit'))
-    },
+            let profitData = {
+                daily: {
+                    labels: @json($dailyProfit->pluck('date')),
+                    data: @json($dailyProfit->pluck('profit'))
+                },
+                monthly: {
+                    labels: @json($monthlyProfit->pluck('month')),
+                    data: @json($monthlyProfit->pluck('profit'))
+                },
+                yearly: {
+                    labels: @json($yearlyProfit->pluck('year')),
+                    data: @json($yearlyProfit->pluck('profit'))
+                },
+                custom: { labels: [], data: [] }
+            };
 
-    custom: { labels: [], data: [] }
-};
+            let profitChart = new Chart(ctxProfit, {
+                type: 'line',
+                data: {
+                    labels: profitData.daily.labels,
+                    datasets: [{
+                        label: 'Profit',
+                        data: profitData.daily.data,
+                        borderColor: 'rgba(34,197,94,1)',
+                        backgroundColor: 'transparent',
+                        fill: false,
+                        tension: 0.2,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
 
-// debug: show what's preloaded (open browser console)
-console.log('preloaded profitData', profitData);
+                        segment: {
+                            borderColor: ctx => {
+                                const curr = ctx.p0.parsed.y;
+                                const next = ctx.p1.parsed.y;
+                                return (curr < 0 || next < 0)
+                                    ? 'rgba(239,68,68,1)'
+                                    : 'rgba(34,197,94,1)';
+                            }
+                        },
 
-// Format monthly labels from "YYYY-MM" to "Mon 'YY" (e.g. Feb '25)
-const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-if (profitData.monthly.labels && profitData.monthly.labels.length) {
-    profitData.monthly.labels = profitData.monthly.labels.map(m => {
-        const parts = (m || '').split('-');
-        if (parts.length !== 2) return m;
-        const y = parts[0];
-        const mm = parseInt(parts[1], 10) - 1;
-        return `${monthNames[mm]} '${String(y).slice(2)}`;
-    });
-}
+                        pointBackgroundColor: ctx =>
+                            ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
 
-let profitChart = new Chart(ctxProfit, {
-    type: 'line',
-    data: {
-        labels: profitData.daily.labels,
-        datasets: [{
-            label: 'Profit',
-            data: profitData.daily.data,
-            borderColor: 'rgba(34,197,94,1)',
-            backgroundColor: 'transparent',
-            fill: false,
-            tension: 0.2,
-            borderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6,
+                        pointBorderColor: ctx =>
+                            ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
 
-            segment: {
-                borderColor: ctx => {
-                    const curr = ctx.p0.parsed.y;
-                    const next = ctx.p1.parsed.y;
-                    return (curr < 0 || next < 0)
-                        ? 'rgba(239,68,68,1)'
-                        : 'rgba(34,197,94,1)';
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            bodyColor: 'white',
+                            titleColor: 'white',
+                            backgroundColor: '#1e293b',
+                            callbacks: {
+                                label: (context) =>
+                                    `₱${context.raw.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
                 }
-            },
-
-            pointBackgroundColor: ctx =>
-                ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
-
-            pointBorderColor: ctx =>
-                ctx.raw < 0 ? 'rgba(239,68,68,1)' : 'rgba(34,197,94,1)',
-
-            pointBorderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false }, 
-            tooltip: {
-                bodyColor: 'white',
-                titleColor: 'white',
-                backgroundColor: '#1e293b',
-                callbacks: {
-                    label: (context) =>
-                        `₱${context.raw.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                }
-            }
-        },
-        scales: {
-            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-            y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
-        }
-    }
-});
+            });
 
 
 
@@ -405,35 +447,9 @@ let profitChart = new Chart(ctxProfit, {
                     document.getElementById('customRangeInputs').classList.remove('hidden');
                 } else {
                     document.getElementById('customRangeInputs').classList.add('hidden');
-                    // if preloaded data is empty, fetch grouped data from API
-                    if (!profitData[type].labels || profitData[type].labels.length === 0) {
-                        fetch(`{{ route('api.profit') }}?group=${type}`)
-                            .then(r => r.json())
-                            .then(data => {
-                                // If monthly, format YYYY-MM => Mon 'YY
-                                if (type === 'monthly' && data.labels && data.labels.length) {
-                                    data.labels = data.labels.map(m => {
-                                        const parts = (m || '').split('-');
-                                        if (parts.length !== 2) return m;
-                                        const y = parts[0];
-                                        const mm = parseInt(parts[1], 10) - 1;
-                                        return `${monthNames[mm]} '${String(y).slice(2)}`;
-                                    });
-                                }
-
-                                profitData[type].labels = data.labels;
-                                profitData[type].data = data.values;
-
-                                profitChart.data.labels = profitData[type].labels;
-                                profitChart.data.datasets[0].data = profitData[type].data;
-                                profitChart.update();
-                            })
-                            .catch(err => console.error('Error fetching grouped profit data:', err));
-                    } else {
-                        profitChart.data.labels = profitData[type].labels;
-                        profitChart.data.datasets[0].data = profitData[type].data;
-                        profitChart.update();
-                    }
+                    profitChart.data.labels = profitData[type].labels;
+                    profitChart.data.datasets[0].data = profitData[type].data;
+                    profitChart.update();
                 }
             });
 

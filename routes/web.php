@@ -42,6 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::resource('equipments', EquipmentController::class);
 
+    // NEW: Equipment image upload route
+    Route::post('/equipments/{equipment}/upload-image', [EquipmentController::class, 'uploadImage'])
+        ->name('equipments.uploadImage');
+
     // Stock logs resource routes (URLs use hyphens, names use underscores)
     Route::resource('stock-logs', StockLogController::class)
         ->only(['index', 'create', 'store', 'destroy'])
