@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Models\StockLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class SaleController extends Controller
 {
@@ -69,6 +70,7 @@ class SaleController extends Controller
                 'quantity'      => $request->quantity,
                 'total_price'   => $totalPrice,
                 'customer_name' => $request->customer_name,
+                'user_id'       => Auth::id(),
             ]);
 
             // Deduct stock
@@ -81,6 +83,7 @@ class SaleController extends Controller
                 'quantity'    => $request->quantity,
                 'total_price' => $totalPrice,
                 'sale_id'     => $sale->id,
+                'user_id'     => Auth::id(),
             ]);
         });
 
@@ -90,6 +93,63 @@ class SaleController extends Controller
     public function show(Sale $sale)
     {
         return view('sales.show', compact('sale'));
+    }
+
+    public function edit(Sale $sale)
+    {
+        $products = Product::all();
+        return view('sales.edit', compact('sale', 'products'));
+    }
+
+    public function update(Request $request, Sale $sale)
+    {
+        $request->validate([
+            'product_id'    => 'required|exists:products,id',
+            'quantity'      => 'required|integer|min:1',
+            'customer_name' => 'required|string|max:255',
+        ]);
+
+        DB::transaction(function () use ($request, $sale) {
+            $product = Product::findOrFail($request->product_id);
+            $oldQuantity = $sale->quantity;
+            $newQuantity = $request->quantity;
+            $quantityDifference = $newQuantity - $oldQuantity;
+
+            // Check if new quantity is less than old and if product has enough stock to accommodate the change
+            if ($quantityDifference > 0 && $product->stock < $quantityDifference) {
+                abort(400, 'Not enough stock available.');
+            }
+
+            $totalPrice = $product->price * $newQuantity;
+
+            // Update Sale
+            $sale->update([
+                'product_id'    => $product->id,
+                'quantity'      => $newQuantity,
+                'total_price'   => $totalPrice,
+                'customer_name' => $request->customer_name,
+            ]);
+
+            // Adjust stock based on quantity difference
+            if ($quantityDifference > 0) {
+                // More quantity needed, deduct from stock
+                $product->decrement('stock', $quantityDifference);
+            } elseif ($quantityDifference < 0) {
+                // Less quantity needed, add back to stock
+                $product->increment('stock', abs($quantityDifference));
+            }
+
+            // Update the associated OUT StockLog
+            StockLog::where('sale_id', $sale->id)
+                ->where('type', 'out')
+                ->update([
+                    'product_id'  => $product->id,
+                    'quantity'    => $newQuantity,
+                    'total_price' => $totalPrice,
+                ]);
+        });
+
+        return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 
     public function destroy(Sale $sale)

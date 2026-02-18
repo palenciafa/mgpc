@@ -19,14 +19,25 @@
             </div>
 
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-3 md:space-y-0">
-                <!-- Filter Form -->
-                <form method="GET" action="{{ route('stock_logs.index') }}" class="flex space-x-2">
+                <!-- Search & Filter Form -->
+                <form method="GET" action="{{ route('stock_logs.index') }}"
+                    class="flex flex-col md:flex-row items-center justify-between w-full md:w-auto gap-3">
+                    <div class="w-full md:w-64 relative">
+                        <input type="text" name="search" placeholder="Search by product, supplier, or customer..." 
+                            value="{{ request('search') }}"
+                            class="w-full px-4 py-2 pl-10 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    
                     <select name="type"
                         class="px-4 py-2 rounded-lg bg-slate-800/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-                        <option value="">All</option>
+                        <option value="">All Types</option>
                         <option value="in" @selected(request('type') == 'in')>IN</option>
                         <option value="out" @selected(request('type') == 'out')>OUT</option>
                     </select>
+                    
                     <button type="submit"
                         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200">
                         Filter
@@ -34,13 +45,10 @@
                 </form>
 
                 <!-- Export Button -->
-                <div class="text-right">
-                    <a href="{{ route('stock_logs.export', request()->query()) }}" 
-   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200">
-    Export to Excel
-</a>
-
-                </div>
+                <a href="{{ route('stock_logs.export', request()->query()) }}" 
+                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200 text-center">
+                    Export to Excel
+                </a>
             </div>
 
             <!-- Success Message -->

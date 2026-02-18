@@ -63,9 +63,6 @@
                             <tr class="hover:bg-slate-700/30 transition-colors duration-200">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-3">
-                                            <span class="text-white font-semibold text-sm">{{ strtoupper(substr($employee->name, 0, 2)) }}</span>
-                                        </div>
                                         <div>
                                             <div class="text-white font-medium">{{ $employee->name }}</div>
                                             <div class="text-slate-400 text-sm">Employee ID: #{{ $employee->id }}</div>

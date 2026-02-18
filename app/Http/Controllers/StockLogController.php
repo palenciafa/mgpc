@@ -6,6 +6,7 @@ use App\Models\StockLog;
 use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StockLogsExport;
 
@@ -14,6 +15,22 @@ class StockLogController extends Controller
     public function index(Request $request)
     {
         $query = StockLog::with(['product', 'user', 'supplier', 'sale']);
+
+        // Search by product name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('supplier', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('sale', function ($q) use ($search) {
+                    $q->where('customer_name', 'like', "%{$search}%");
+                });
+            });
+        }
 
         // Filter by type IN/OUT
         if ($request->filled('type')) {
@@ -25,7 +42,7 @@ class StockLogController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
-        $stockLogs = $query->orderBy('created_at', 'desc')->paginate(10);
+        $stockLogs = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         $suppliers = Supplier::all();
 
         return view('stock_logs.index', compact('stockLogs', 'suppliers'));
@@ -58,7 +75,7 @@ class StockLogController extends Controller
             'product_id'   => $product->id,
             'type'         => 'in',
             'quantity'     => $request->quantity,
-            'user_id'      => auth()->id(),
+            'user_id'      => Auth::id(),
             'supplier_id'  => $request->supplier_id,
             'buying_price' => $request->buying_price,
         ]);
@@ -81,6 +98,22 @@ class StockLogController extends Controller
     public function export(Request $request)
     {
         $query = StockLog::with(['product', 'user', 'supplier', 'sale']);
+
+        // Search by product name
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('supplier', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('sale', function ($q) use ($search) {
+                    $q->where('customer_name', 'like', "%{$search}%");
+                });
+            });
+        }
 
         // Apply the same filters as the index
         if ($request->filled('type')) {

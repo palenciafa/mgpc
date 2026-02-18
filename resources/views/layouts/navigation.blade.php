@@ -167,14 +167,20 @@
                     class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                     Dashboard
                 </a>
+                <a href="/employees"
+                    class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+                    Employees
+                </a>
                 <a href="/categories"
                     class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                     Categories
                 </a>
-                <a href="/suppliers"
-                    class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
-                    Suppliers
-                </a>
+                @if(auth()->check() && auth()->user()->role === 'owner')
+                    <a href="/suppliers"
+                        class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+                        Suppliers
+                    </a>
+                @endif
                 <a href="/products"
                     class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
                     Products
