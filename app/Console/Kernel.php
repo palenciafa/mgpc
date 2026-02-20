@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Console;
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    /**
+     * Define the application's command schedule.
+     */
+    protected function schedule(Schedule $schedule): void
+    {
+        // Backup database daily at 2:00 AM
+        $schedule->command('db:backup')
+                 ->dailyAt('02:00')
+                 ->withoutOverlapping();
+
+        // Alternative: Backup every 6 hours
+        // $schedule->command('db:backup')->everyHours(6)->withoutOverlapping();
+
+        // Alternative: Backup every day at midnight
+        // $schedule->command('db:backup')->daily()->withoutOverlapping();
+    }
+
+    /**
+     * Register the commands for the application.
+     */
+    protected function commands(): void
+    {
+        $this->load(__DIR__.'/Commands');
+
+        require base_path('routes/console.php');
+    }
+}

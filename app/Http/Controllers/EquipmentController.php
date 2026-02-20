@@ -41,6 +41,7 @@ class EquipmentController extends Controller
         $request->validate([
             'brand' => 'required|string|max:255',
             'name' => 'required|string|max:255',
+            'date_issued' => 'nullable|date',
             'employee_id' => 'nullable|exists:employees,id',
             'status' => 'required|in:good condition,bad condition,for repair,lost',
         ]);
@@ -69,6 +70,7 @@ class EquipmentController extends Controller
             'control_number' => $controlNumber,
             'brand' => $request->brand,
             'name' => $request->name,
+            'date_issued' => $request->date_issued,
             'employee_id' => $request->employee_id,
             'status' => $request->status, // Save the selected status
         ]);
@@ -89,6 +91,7 @@ class EquipmentController extends Controller
         $request->validate([
             'brand' => 'required|string|max:255',
             'name' => 'required|string|max:255',
+            'date_issued' => 'nullable|date',
             'employee_id' => 'nullable|exists:employees,id',
             'status' => 'required|in:good condition,bad condition,for repair,lost',
         ]);
@@ -96,6 +99,7 @@ class EquipmentController extends Controller
         $equipment->update([
             'brand' => $request->brand,
             'name' => $request->name,
+            'date_issued' => $request->date_issued,
             'employee_id' => $request->employee_id,
             'status' => $request->status, // Update the selected status
         ]);

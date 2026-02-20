@@ -79,6 +79,14 @@
                            class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-colors duration-200">
                 </div>
 
+                <!-- Date Issued -->
+                <div>
+                    <label for="date_issued" class="block text-sm font-medium text-white mb-3">Date Issued</label>
+                    <input type="date" name="date_issued" id="date_issued"
+                           value="{{ old('date_issued', $equipment->date_issued ? $equipment->date_issued->format('Y-m-d') : '') }}"
+                           class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-colors duration-200">
+                </div>
+
                 <!-- Assigned Employee -->
                 <div>
                     <label for="employee_id" class="block text-sm font-medium text-white mb-3">Assign Employee</label>

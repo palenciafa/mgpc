@@ -58,6 +58,7 @@
                             <tr>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Control Number</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Equipment Name</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Date Issued</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Assigned Employee</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Status</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
@@ -69,6 +70,7 @@
                                     <td class="px-6 py-4 text-white font-medium">{{ $equipment->control_number }}</td>
                                     <td class="px-6 py-4 text-white font-medium">{{ $equipment->brand }} -
                                         {{ $equipment->name }}</td>
+                                    <td class="px-6 py-4 text-slate-400">{{ $equipment->date_issued ? $equipment->date_issued->format('m/d/Y') : 'N/A' }}</td>
                                     <td class="px-6 py-4 text-slate-400">
                                         {{ $equipment->employee ? $equipment->employee->name : 'Unassigned' }}</td>
                                     <td class="px-6 py-4">

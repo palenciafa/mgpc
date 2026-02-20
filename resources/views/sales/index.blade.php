@@ -75,7 +75,8 @@
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Customer</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Product</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Category</th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Amount</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Quantity</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-white"></th>Amount</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Date</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
                             </tr>
@@ -99,6 +100,9 @@
                                     <td class="px-6 py-4 text-slate-400">
                                         {{ $sale->product->category->name ?? 'Uncategorized' }}
                                     </td>
+
+                                    <!-- Quantity -->
+                                    <td class="px-6 py-4 text-white font-medium">{{ $sale->quantity }}</td>
 
                                     <!-- Amount -->
                                     <td class="px-6 py-4 text-white font-medium">₱{{ number_format($sale->total_price, 2) }}

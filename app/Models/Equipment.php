@@ -15,8 +15,13 @@ class Equipment extends Model
         'control_number',
         'brand',        
         'name',
+        'date_issued',
         'employee_id',
         'status',
+    ];
+
+    protected $casts = [
+        'date_issued' => 'date',
     ];
 
     public function employee()

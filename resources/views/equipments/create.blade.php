@@ -104,6 +104,31 @@
                     <p class="mt-2 text-sm text-slate-400">Enter the name of the equipment</p>
                 </div>
 
+                <!-- Date Issued -->
+                <div>
+                    <label for="date_issued" class="block text-sm font-medium text-white mb-3">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Date Issued
+                        </div>
+                    </label>
+                    <div class="relative">
+                        <input type="date" 
+                               name="date_issued" 
+                               id="date_issued" 
+                               value="{{ old('date_issued') }}"
+                               class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-colors duration-200">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-400">Enter the date when this equipment was issued</p>
+                </div>
+
                 <!-- Assigned Employee Select -->
                 <div>
                     <label for="employee_id" class="block text-sm font-medium text-white mb-3">
